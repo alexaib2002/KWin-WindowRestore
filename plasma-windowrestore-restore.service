@@ -1,0 +1,9 @@
+[Unit]
+Description=KDE Window Restoration Restore Trigger
+Requires=plasma-windowrestore.service
+After=plasma-restoresession.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/qdbus org.kde.KWin.Script.WindowRestore /WindowRestore org.kde.kwin.Script.TriggerRestore
+Slice=session.slice

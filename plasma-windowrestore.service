@@ -1,0 +1,13 @@
+[Unit]
+Description=KDE Window Restoration Helper Service
+After=plasma-restoresession.service
+
+[Service]
+Type=dbus
+BusName=org.kde.KWin.Script.WindowRestore
+Environment=PYTHONUNBUFFERED=1
+ExecStart=python3 %h/.local/bin/plasma-windowrestore.py
+Slice=session.slice
+
+[Install]
+WantedBy=plasma-core.target

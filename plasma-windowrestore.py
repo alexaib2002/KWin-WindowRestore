@@ -16,17 +16,16 @@ def get_xdg_data_home() -> str:
 
 # Service declarations
 SERVICE_NAME = "WindowRestore"
-SERVICE_PATH = "WindowRestore"
 # KWin constants
 BUS_KWIN = "org.kde.KWin"
 BUS_KWIN_SCRIPT = f"{BUS_KWIN}.Script"
 INTERFACE_KWIN = BUS_KWIN.lower()
 INTERFACE_SCRIPT = f"{INTERFACE_KWIN}.Script"
 # JS constants
-JS_DIR = os.path.dirname(os.path.abspath(__file__))
+JS_DIR = f"{get_xdg_data_home()}/kwinrestore/scripts"
 JS_SAVE = f"{JS_DIR}/kwin_save.js"
 JS_RESTORE = f"{JS_DIR}/kwin_restore.js"
-PERSISTENCE_PATH = f"{get_xdg_data_home()}/kwindowrestore.json"
+PERSISTENCE_PATH = f"{get_xdg_data_home()}/kwinrestore/sessions.json"
 
 
 def get_kwin_scripting() -> dbus.Interface:
@@ -83,7 +82,7 @@ class WindowRestoreService(dbus.service.Object):
         bus = dbus.SessionBus()
         bus.request_name(f"{BUS_KWIN_SCRIPT}.{SERVICE_NAME}")
         bus_name = dbus.service.BusName(f"{BUS_KWIN}.Scripting", bus=bus)
-        dbus.service.Object.__init__(self, bus_name, f"/{SERVICE_PATH}")
+        dbus.service.Object.__init__(self, bus_name, f"/{SERVICE_NAME}")
 
     @dbus.service.method(dbus_interface="org.kde.kwin.Script",
                             in_signature="", out_signature="")
@@ -91,6 +90,7 @@ class WindowRestoreService(dbus.service.Object):
         """Restores saved window data. by executing the loading script.
         User should trigger this function.
         """
+        print("Starting restore request")
         load_and_run_kwinjs(JS_RESTORE)
 
     @dbus.service.method(dbus_interface="org.kde.kwin.Script",
@@ -111,6 +111,7 @@ class WindowRestoreService(dbus.service.Object):
         """Stores opened window data by executing the save script.
         User should trigger this function.
         """
+        print("Starting save request")
         load_and_run_kwinjs(JS_SAVE)
 
     @dbus.service.method(dbus_interface="org.kde.kwin.Script",
